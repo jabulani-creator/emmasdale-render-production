@@ -555,6 +555,19 @@ Questions
   align-self: center;
   min-width: 2rem;
 }
+.btn-question {
+  cursor: pointer;
+  color: var(--white);
+  background: var(--clr-grey-3);
+  border: transparent;
+  border-radius: var(--borderRadius);
+  letter-spacing: var(--letterSpacing);
+  padding: 0.6rem 0.75rem;
+  box-shadow: var(--shadow-2);
+  transition: var(--transition);
+  text-transform: capitalize;
+  display: inline-block;
+}
 .q-icon {
   font-weight: bold;
 }
@@ -927,6 +940,7 @@ Stock Photos
 .submit-btnS {
   padding: 0.75rem 1.25rem;
   border: none;
+  outline: none;
   text-transform: capitalize;
   letter-spacing: var(--spacing);
   font-size: 1.5rem;

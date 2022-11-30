@@ -7,7 +7,7 @@ const Question = ({ title, message }) => {
     <section className="question">
       <header>
         <h4>{title}</h4>
-        <button className="btn-q" onClick={() => setShowInfo(!showInfo)}>
+        <button className="btn-question" onClick={() => setShowInfo(!showInfo)}>
           {showInfo ? (
             <AiOutlineMinus className="q-icon" />
           ) : (
