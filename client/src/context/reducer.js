@@ -88,6 +88,8 @@ import {
   CREATE_RESOURCE_ERROR,
   GET_RESOURCE_BEGIN,
   GET_RESOURCE_SUCCESS,
+  GET_CURRENT_USER_BEGINS,
+  GET_CURRENT_USER_SUCCESS,
 } from "./actions";
 
 import { initialState } from "./appContext";
@@ -119,7 +121,6 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       user: action.payload.user,
-      token: action.payload.token,
       userPosition: action.payload.position,
       showAlert: true,
       alertType: "success",
@@ -146,7 +147,6 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       user: action.payload.user,
-      token: action.payload.token,
       userPosition: action.payload.position,
       showAlert: true,
       alertType: "success",
@@ -178,7 +178,6 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      token: action.payload.token,
       user: action.payload.user,
       userPosition: action.payload.position,
       showAlert: true,
@@ -217,8 +216,7 @@ const reducer = (state, action) => {
     return {
       ...initialState,
       user: null,
-      token: null,
-      userPosition: "",
+      userLoading: false,
     };
   }
   /**********************************************POSTS********************************************************** */
@@ -756,7 +754,7 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      resources: action.payload.resources
+      resources: action.payload.resources,
     };
   }
   /************************************************ELDER START************************************************************  */
@@ -795,6 +793,17 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       elders: action.payload.elders,
+    };
+  }
+  if (action.type === GET_CURRENT_USER_BEGINS) {
+    return { ...state, userLoading: true, showAlert: false };
+  }
+  if (action.type === GET_CURRENT_USER_SUCCESS) {
+    return {
+      ...state,
+      userLoading: false,
+      user: action.payload.user,
+      userPosition: action.payload.position,
     };
   } else {
     /************************************************WORKER END************************************************************  */

@@ -5,6 +5,7 @@ const app = express();
 import dotenv from "dotenv";
 dotenv.config();
 import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
 
 // import fileUpload from "express-fileupload";
 import cloudinary from "cloudinary";
@@ -59,6 +60,7 @@ app.use(
 );
 app.use(xss());
 app.use(mongoSanitize());
+app.use(cookieParser());
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
