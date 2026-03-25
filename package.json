@@ -9,6 +9,7 @@
     "install-client": "cd next-client && npm install --legacy-peer-deps",
     "build-client": "cd next-client && npm run build",
     "server": "nodemon --exec tsx --env-file=.env server.ts --ignore next-client",
+    "server:prod": "tsx server.ts",
     "client": "npm run dev --prefix next-client",
     "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
