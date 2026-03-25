@@ -39,6 +39,6 @@ services:
         fromService:
           type: web
           name: emmasdale-backend
-          property: url
-          # Appends /api/v1 to the backend's root URL
-          transform: "${url}/api/v1"
+          property: host
+          # Constructs the full HTTPS URL using the backend host
+          transform: "https://${host}/api/v1"
