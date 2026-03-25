@@ -109,8 +109,8 @@ app.use(cookieParser());
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// only when ready to deploy
-app.use(express.static(path.resolve(__dirname, "./client/build")));
+// Next.js frontend is deployed as a separate service now, so we don't serve a built React SPA from the backend anymore.
+// The backend is strictly a JSON API.
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postsRouter);
@@ -128,8 +128,9 @@ app.use("/api/v1/resource", resourceRouter);
 app.use("/api/v1/ministry", ministryRouter);
 app.use("/api/v1/sermons", sermonRouter);
 
-app.get("*", function (request, response) {
-  response.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+// Basic health check route for the root
+app.get("/", (req, res) => {
+  res.status(200).json({ msg: "Emmasdale SDA Church API is running successfully!" });
 });
 
 app.use(notFoundMiddleware);
