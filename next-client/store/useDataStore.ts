@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
-import { authFetch } from './useAuthStore';
+import { authFetch, API_URL } from './useAuthStore';
 import { useFormStore } from './useFormStore';
 import { Post, Event, HealthPost, ContactRequest, Personnel, Review, Resource, ImageDoc } from '../types';
 
@@ -104,7 +104,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getPosts: async () => {
     const { page, search, sort } = useFormStore.getState();
-    let url = `http://localhost:5000/api/v1/posts?page=${page}&sort=${sort}`;
+    let url = `${API_URL}/posts?page=${page}&sort=${sort}`;
     if (search) url += `&search=${search}`;
     
     set({ isLoading: true });
@@ -152,7 +152,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getHealthPost: async () => {
     const { page, search, sort } = useFormStore.getState();
-    let url = `http://localhost:5000/api/v1/health?page=${page}&sort=${sort}`;
+    let url = `${API_URL}/health?page=${page}&sort=${sort}`;
     if (search) url += `&search=${search}`;
     
     set({ isLoading: true });
@@ -199,7 +199,7 @@ export const useDataStore = create<DataState>((set, get) => ({
   },
 
   getEvents: async () => {
-    let url = `http://localhost:5000/api/v1/events`;
+    let url = `${API_URL}/events`;
     set({ isLoading: true });
     try {
       const { data } = await axios.get(url);
@@ -258,7 +258,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   createRequest: async (requestData) => {
     try {
-      await axios.post("http://localhost:5000/api/v1/contact", requestData);
+      await axios.post(`${API_URL}/contact`, requestData);
       useFormStore.getState().clearValues();
     } catch (error: any) {
       throw new Error(error.response?.data?.msg || "Error creating request");
@@ -276,7 +276,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getPhotos: async () => {
     const { page, search, searchDepartment } = useFormStore.getState();
-    let url = `http://localhost:5000/api/v1/image?page=${page}&department=${searchDepartment}`;
+    let url = `${API_URL}/image?page=${page}&department=${searchDepartment}`;
     if (search) url += `&search=${search}`;
     
     set({ isLoading: true });
@@ -300,7 +300,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getPastors: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/pastor");
+      const { data } = await axios.get(`${API_URL}/pastor`);
       set({ pastors: data.pastors });
     } catch (error) {}
   },
@@ -316,7 +316,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getWorkers: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/worker");
+      const { data } = await axios.get(`${API_URL}/worker`);
       set({ workers: data.workers });
     } catch (error) {}
   },
@@ -332,7 +332,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getPositions: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/position");
+      const { data } = await axios.get(`${API_URL}/position`);
       set({ leaders: data.leaders });
     } catch (error) {}
   },
@@ -347,7 +347,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getElders: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/elder");
+      const { data } = await axios.get(`${API_URL}/elder`);
       set({ elders: data.elders });
     } catch (error) {}
   },
@@ -363,14 +363,14 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getReviews: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/review");
+      const { data } = await axios.get(`${API_URL}/review`);
       set({ reviews: data.reviews });
     } catch (error) {}
   },
 
   createReview: async (review) => {
     try {
-      await axios.post("http://localhost:5000/api/v1/review", review);
+      await axios.post(`${API_URL}/review`, review);
       useFormStore.getState().clearValues();
     } catch (error: any) {
       throw new Error(error.response?.data?.msg || "Error creating review");
@@ -379,7 +379,7 @@ export const useDataStore = create<DataState>((set, get) => ({
 
   getResources: async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/v1/resource");
+      const { data } = await axios.get(`${API_URL}/resource`);
       set({ resources: data.resources });
     } catch (error) {
       console.log(error);

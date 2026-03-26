@@ -23,8 +23,10 @@ interface AuthState {
   addLeader: (leaderData: any) => Promise<{success: boolean; error?: string}>;
 }
 
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
 export const authFetch = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: API_URL,
 });
 
 export const useAuthStore = create<AuthState>((set, get) => {
@@ -50,20 +52,23 @@ export const useAuthStore = create<AuthState>((set, get) => {
     registerUser: async (currentUser) => {
       set({ isLoading: true });
       try {
-        const response = await axios.post("http://localhost:5000/api/v1/auth/register", currentUser);
+        const response = await axios.post(`${API_URL}/auth/register`, currentUser);
         const { user, position } = response.data;
         set({ user, userPosition: position, isLoading: false });
-        toast.success("Account created successfully!");
+        toast.success("User Created! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
       } catch (error: any) {
+        toast.error(error.response.data.msg);
         set({ isLoading: false });
-        toast.error(error?.response?.data?.msg || "Registration failed. Please try again.");
       }
     },
 
     loginUser: async (currentUser) => {
       set({ isLoading: true });
       try {
-        const { data } = await axios.post("http://localhost:5000/api/v1/auth/login", currentUser);
+        const { data } = await axios.post(`${API_URL}/auth/login`, currentUser);
         const { user, position } = data;
         set({ user, userPosition: position, isLoading: false });
         toast.success("Login successful! Redirecting to dashboard...");

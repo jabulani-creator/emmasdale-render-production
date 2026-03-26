@@ -53,7 +53,7 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900">
         <div className="absolute inset-0 z-0">
           <Image 
-            src="https://images.unsplash.com/photo-1438283173091-5dbf5c5a3206?auto=format&fit=crop&w=2000&q=80" 
+           src="/3.jpg" 
             alt="Church Background" 
             fill 
             className="object-cover opacity-40"
