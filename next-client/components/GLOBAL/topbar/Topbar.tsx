@@ -18,6 +18,7 @@ export const Topbar = ({ isOpen, toggle }: { isOpen?: boolean; toggle?: () => vo
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/new' onClick={toggle}>I'm New Here</Link>
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/about' onClick={toggle}>About Us</Link>
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/ministries' onClick={toggle}>Ministries</Link>
+          <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/events' onClick={toggle}>Events</Link>
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/media' onClick={toggle}>Media</Link>
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/resources' onClick={toggle}>Resources</Link>
           <Link className="text-2xl font-medium text-white hover:text-teal-400 transition-colors" href='/contact' onClick={toggle}>Contact</Link>

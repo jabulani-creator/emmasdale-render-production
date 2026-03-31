@@ -1,9 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
-
 @import "tailwindcss";
 
 @theme {
   --animate-fade-in: fadeIn 0.2s ease-out forwards;
+  --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   
   @keyframes fadeIn {
     0% { opacity: 0; transform: scale(0.95) translateY(-10px); }
@@ -105,11 +105,10 @@ html {
   --green-dark: #0f5132;
   --clr-red-special: #b4345c;
 
-  /* fonts  */
-  /* --headingFont: 'Roboto Condensed', Sans-Serif; */
-  --Font: "Roboto", sans-serif;
-  /* --bodyFont: 'Cabin', Sans-Serif; */
-  --bodyFont: "Roboto", sans-serif;
+  /* fonts — match next/font variables on <html> */
+  --Font: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  --bodyFont: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  --headingFont: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --small-text: 0.875rem;
   --extra-small-text: 0.7em;
   /* rest of the vars */

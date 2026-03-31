@@ -36,6 +36,7 @@ export const Navbar = ({ toggle, isOpen }: { toggle?: () => void; isOpen?: boole
               { name: 'Home', path: '/' },
               { name: 'About', path: '/about' },
               { name: 'Ministries', path: '/ministries' },
+              { name: 'Events', path: '/events' },
               { name: 'Media', path: '/media' },
               { name: 'Give', path: '/give' },
               { name: 'Contact', path: '/contact' }
