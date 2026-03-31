@@ -1,11 +1,30 @@
 /** @type {import('next').NextConfig} */
+function apiOriginForCsp() {
+  const raw = process.env.NEXT_PUBLIC_API_URL
+  if (!raw) return ""
+  try {
+    return new URL(raw).origin
+  } catch {
+    return ""
+  }
+}
+
+const connectSrcExtra = [
+  "http://localhost:5000",
+  "https://emmasdale-render-production.onrender.com",
+  "https://emmasdale-backend.onrender.com",
+  apiOriginForCsp(),
+].filter(Boolean)
+
+const connectSrc = ["'self'", ...new Set(connectSrcExtra)].join(" ")
+
 const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' blob: data: https://res.cloudinary.com https://www.adventist.org;
-    connect-src 'self' http://localhost:5000 https://emmasdale-render-production.onrender.com;
+    connect-src ${connectSrc};
     object-src 'none';
     base-uri 'self';
     form-action 'self';
