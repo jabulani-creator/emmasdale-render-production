@@ -370,6 +370,15 @@ export default async function Home() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-amber-900/70">Calendar</p>
               <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-stone-900 md:text-3xl">Upcoming events</h2>
               <p className="mt-2 text-sm text-stone-600 md:text-base">Services, programs, and special gatherings.</p>
+              <p className="mt-4 rounded-lg border border-amber-200/70 bg-amber-50 px-4 py-3 text-sm text-stone-800">
+                <span className="font-semibold text-amber-950">Featured:</span>{" "}
+                <Link
+                  href="/events/singles-unplugged"
+                  className="font-semibold text-amber-900 underline decoration-amber-700/40 underline-offset-2 hover:text-amber-950"
+                >
+                  Singles Unplugged — 2 May 2026
+                </Link>
+              </p>
             </div>
 
             <EventTicketList events={events || []} limit={8} ctaStyle="teaser" />

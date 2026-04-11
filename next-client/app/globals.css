@@ -17,6 +17,11 @@
   box-sizing: border-box;
 }
 
+/* Singles Unplugged landing — serif titles (Cormorant via layout variable) */
+.singles-unplugged-theme .font-su-serif {
+  font-family: var(--font-singles-serif), Georgia, ui-serif, serif;
+}
+
 /* Custom Scrollbar for Dashboard */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -1109,7 +1114,7 @@ Stock Photos
   border: 4px solid var(--clr-grey-8);
   box-shadow: var(--dark-shadow);
 }
-article h4 {
+.section-center-slider article h4 {
   text-transform: uppercase;
   color: var(--clr-primary-5);
   margin-bottom: 0.25rem;
@@ -1169,7 +1174,8 @@ article h4 {
     font-size: 1.5rem;
   }
 }
-article {
+/* Slider slides only — unscoped `article` hid all other <article> UIs (e.g. event list). */
+.section-center-slider article {
   position: absolute;
   top: 0;
   left: 0;
@@ -1178,14 +1184,14 @@ article {
   opacity: 0;
   transition: var(--transition);
 }
-article.activeSlide {
+.section-center-slider article.activeSlide {
   opacity: 1;
   transform: translateX(0);
 }
-article.lastSlide {
+.section-center-slider article.lastSlide {
   transform: translateX(-100%);
 }
-article.nextSlide {
+.section-center-slider article.nextSlide {
   transform: translateX(100%);
 }
 

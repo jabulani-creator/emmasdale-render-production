@@ -56,6 +56,7 @@ import reviewRouter from "./routes/reviewRoute.js";
 import resourceRouter from "./routes/resourceRoute.js";
 import ministryRouter from "./routes/ministryRoute.js";
 import sermonRouter from "./routes/sermonRoute.js";
+import singlesUnpluggedRouter from "./routes/singlesUnpluggedRoute.js";
 //middleware
 import notFoundMiddleware from "./middleware/not-found.js";
 import errorHandlerMiddleware from "./middleware/error-handler.js";
@@ -100,7 +101,13 @@ app.use(
       "img-src": ["'self'", "data:", "https://res.cloudinary.com", "https://images.unsplash.com", "blob:"],
       "connect-src": ["'self'", "https://res.cloudinary.com"],
       "media-src": ["'self'", "https://res.cloudinary.com"],
-      "frame-src": ["'self'", "https://www.youtube.com", "https://youtube.com"]
+      "frame-src": [
+        "'self'",
+        "https://www.youtube.com",
+        "https://youtube.com",
+        "https://www.google.com",
+        "https://maps.google.com",
+      ],
     },
   })
 );
@@ -127,6 +134,7 @@ app.use("/api/v1/review", reviewRouter);
 app.use("/api/v1/resource", resourceRouter);
 app.use("/api/v1/ministry", ministryRouter);
 app.use("/api/v1/sermons", sermonRouter);
+app.use("/api/v1/singles-unplugged", singlesUnpluggedRouter);
 
 // Basic health check route for the root
 app.get("/", (req, res) => {

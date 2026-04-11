@@ -23,11 +23,12 @@ const cspHeader = `
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' blob: data: https://res.cloudinary.com https://www.adventist.org;
+    img-src 'self' blob: data: https://res.cloudinary.com https://www.adventist.org https://images.unsplash.com;
     connect-src ${connectSrc};
     object-src 'none';
     base-uri 'self';
     form-action 'self';
+    frame-src 'self' https://www.google.com https://maps.google.com;
     frame-ancestors 'none';
     upgrade-insecure-requests;
 `

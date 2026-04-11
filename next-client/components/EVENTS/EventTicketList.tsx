@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaClock, FaCalendarAlt } from "react-icons/fa";
 import { eventDateParts } from "../../lib/eventDateParts";
+import { SINGLES_UNPLUGGED_LISTING } from "../../lib/featuredSinglesUnpluggedEvent";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1438232992991-995a7525abf1?auto=format&fit=crop&w=800&q=80";
@@ -14,9 +15,57 @@ type Props = {
   ctaStyle?: "teaser" | "detail";
 };
 
+function resolvePrimaryCta(event: any, isTeaser: boolean) {
+  if (event.primaryCtaHref) {
+    return {
+      href: event.primaryCtaHref,
+      label: event.primaryCtaLabel ?? (isTeaser ? "Learn more" : "View invitation & reserve"),
+    };
+  }
+  return {
+    href: isTeaser ? "/events" : "/contact",
+    label: isTeaser ? "Learn more" : "Questions? Contact us",
+  };
+}
+
+function resolveSecondaryCta(event: any, isTeaser: boolean) {
+  if (isTeaser && event.secondaryCtaHrefTeaser != null) {
+    return {
+      href: event.secondaryCtaHrefTeaser,
+      label: event.secondaryCtaLabelTeaser ?? "View details",
+    };
+  }
+  if (!isTeaser && event.secondaryCtaHrefDetail != null) {
+    return {
+      href: event.secondaryCtaHrefDetail,
+      label: event.secondaryCtaLabelDetail ?? "Plan your visit",
+    };
+  }
+  if (event.secondaryCtaHref != null) {
+    return {
+      href: event.secondaryCtaHref,
+      label: event.secondaryCtaLabel ?? (isTeaser ? "View details" : "Plan your visit"),
+    };
+  }
+  return {
+    href: isTeaser ? "/events" : "/plan-your-visit",
+    label: isTeaser ? "View details" : "Plan your visit",
+  };
+}
+
+function mergeWithFeaturedSingles(events: any[]) {
+  const raw = Array.isArray(events) ? events : [];
+  const fid = SINGLES_UNPLUGGED_LISTING._id;
+  if (raw.some((e) => e && (e._id === fid || e.primaryCtaHref === "/events/singles-unplugged"))) {
+    return raw;
+  }
+  return [SINGLES_UNPLUGGED_LISTING, ...raw];
+}
+
 export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
   const isTeaser = ctaStyle === "teaser";
-  const list = limit != null ? events.slice(0, limit) : events;
+  const merged = mergeWithFeaturedSingles(events);
+  const list = limit != null ? merged.slice(0, limit) : merged;
 
   if (!list.length) {
     return (
@@ -28,16 +77,20 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
 
   return (
     <ul>
-      {list.map((event: any) => {
+      {list.map((event: any, index: number) => {
         const parts = eventDateParts(event.eventDate);
         const title = event.eventTitle || event.eventName || "Church event";
         const venue = event.venue || event.eventVenue || "Venue to be announced";
         const timeStr = event.time || event.eventTime || "Time TBC";
         const imgSrc = event.eventPhoto || FALLBACK_IMG;
+        const badge = event.listBadge || "Church";
+        const primary = resolvePrimaryCta(event, isTeaser);
+        const secondary = resolveSecondaryCta(event, isTeaser);
 
+        const rowKey = event?._id != null ? String(event._id) : `event-row-${index}`;
         return (
-          <li key={event._id} className="border-b border-stone-100 last:border-b-0">
-            <article className="bg-white md:hidden">
+          <li key={rowKey} className="border-b border-stone-100 last:border-b-0">
+            <div className="relative isolate bg-white opacity-100 md:hidden" role="article">
               <div className="relative aspect-[16/10] w-full bg-stone-200">
                 <Image src={imgSrc} alt={title} fill className="object-cover" sizes="100vw" />
                 <span
@@ -50,7 +103,7 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
                 />
               </div>
               <div className="px-5 pb-6 pt-5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-900/80">Church</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-900/80">{badge}</p>
                 <h3 className="mt-1 font-serif text-2xl font-semibold leading-tight text-stone-900">{title}</h3>
                 <p className="mt-1 text-sm text-stone-600">{venue}</p>
                 <div className="mt-4 flex flex-wrap gap-5 text-sm text-stone-600">
@@ -65,22 +118,25 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
                 </div>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Link
-                    href={isTeaser ? "/events" : "/contact"}
+                    href={primary.href}
                     className="inline-flex h-11 w-full items-center justify-center rounded-sm bg-amber-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-amber-950 sm:w-auto"
                   >
-                    {isTeaser ? "Learn more" : "Questions? Contact us"}
+                    {primary.label}
                   </Link>
                   <Link
-                    href={isTeaser ? "/events" : "/plan-your-visit"}
+                    href={secondary.href}
                     className="text-center text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
                   >
-                    {isTeaser ? "View details" : "Plan your visit"}
+                    {secondary.label}
                   </Link>
                 </div>
               </div>
-            </article>
+            </div>
 
-            <article className="hidden bg-white md:flex md:flex-row md:items-stretch">
+            <div
+              className="relative isolate hidden bg-white opacity-100 md:flex md:flex-row md:items-stretch"
+              role="article"
+            >
               <div className="flex w-[5.75rem] shrink-0 flex-col border-r border-stone-200">
                 <div className="flex flex-1 flex-col items-center justify-center bg-white px-2 py-5">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-stone-500">
@@ -94,7 +150,7 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
               </div>
 
               <div className="flex min-w-0 flex-1 flex-col justify-center px-8 py-7">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-900/80">Church</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-900/80">{badge}</p>
                 <h3 className="mt-2 font-serif text-2xl font-semibold leading-tight text-stone-900 lg:text-[1.65rem] lg:leading-snug">
                   {title}
                 </h3>
@@ -102,16 +158,16 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
                 <p className="mt-1 text-xs text-stone-500">{parts.line}</p>
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <Link
-                    href={isTeaser ? "/events" : "/contact"}
+                    href={primary.href}
                     className="inline-flex h-10 items-center justify-center rounded-sm bg-amber-900 px-7 text-sm font-semibold text-white transition-colors hover:bg-amber-950"
                   >
-                    {isTeaser ? "Learn more" : "Questions? Contact us"}
+                    {primary.label}
                   </Link>
                   <Link
-                    href={isTeaser ? "/events" : "/plan-your-visit"}
+                    href={secondary.href}
                     className="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
                   >
-                    {isTeaser ? "View details" : "Plan your visit"}
+                    {secondary.label}
                   </Link>
                 </div>
               </div>
@@ -129,7 +185,7 @@ export function EventTicketList({ events, limit, ctaStyle = "detail" }: Props) {
                   />
                 </div>
               </div>
-            </article>
+            </div>
           </li>
         );
       })}

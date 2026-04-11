@@ -51,3 +51,25 @@ export const pdfSchema = z.object({
 export const gallerySchema = z.object({
   department: z.enum(["Youth", "Women", "Music", "Amo"]).optional(),
 });
+
+export const singlesUnpluggedReservationSchema = z.object({
+  fullName: z.string({ required_error: "Full name is required" } as any).min(2, "Full name is too short").max(120),
+  phone: z.string({ required_error: "Phone number is required" } as any).min(8, "Enter a valid phone number").max(30),
+  email: z.union([z.string().email("Invalid email"), z.literal("")]).optional(),
+  gender: z.enum(["Male", "Female"]),
+  ageGroup: z.enum(["18-24", "25-32", "33+"]),
+  dietary: z.string().max(500).optional().or(z.literal("")),
+  heardFrom: z.enum(["Church announcement", "WhatsApp", "Friend invitation", "Poster", "Other"]),
+  joinWhatsappGroup: z.boolean(),
+  numberOfPeople: z.union([z.literal(1), z.literal(2)]),
+});
+
+export const singlesUnpluggedConfirmPaymentSchema = z.object({
+  reservationId: z.string({ required_error: "Reservation is required" } as any).min(20, "Invalid reservation"),
+  transactionRef: z
+    .string({ required_error: "Transaction reference is required" } as any)
+    .min(4, "Enter at least the last digits of your Airtel Money reference")
+    .max(80),
+  amount: z.coerce.number().int().refine((n) => n === 100 || n === 200, "Amount must be K100 or K200"),
+  proofNote: z.string().max(500).optional().or(z.literal("")),
+});

@@ -92,6 +92,19 @@ export default async function EventsPage() {
             </p>
           </div>
 
+          <div className="border-b border-amber-200/60 bg-amber-50 px-6 py-4 md:px-10">
+            <p className="text-sm text-stone-800">
+              <span className="font-semibold text-amber-950">Featured:</span>{" "}
+              <Link
+                href="/events/singles-unplugged"
+                className="font-semibold text-amber-900 underline decoration-amber-700/50 underline-offset-2 hover:text-amber-950"
+              >
+                Singles Unplugged — 2 May 2026
+              </Link>
+              <span className="text-stone-600"> · Invitation &amp; seat reservation</span>
+            </p>
+          </div>
+
           <EventTicketList events={events} ctaStyle="detail" />
         </div>
 

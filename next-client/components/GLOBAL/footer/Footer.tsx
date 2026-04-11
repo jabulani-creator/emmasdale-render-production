@@ -23,6 +23,7 @@ export const Footer = () => {
             <li><Link href="/" className={footerLinkClass}>Home</Link></li>
             <li><Link href="/about" className={footerLinkClass}>About us</Link></li>
             <li><Link href="/events" className={footerLinkClass}>Events</Link></li>
+            <li><Link href="/events/singles-unplugged" className={footerLinkClass}>Singles Unplugged</Link></li>
             <li><Link href="/media" className={footerLinkClass}>Media & sermons</Link></li>
             <li><Link href="/contact" className={footerLinkClass}>Contact</Link></li>
             <li><Link href="/give" className={footerLinkClass}>Give</Link></li>
