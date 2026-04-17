@@ -376,7 +376,7 @@ export default async function Home() {
                   href="/events/singles-unplugged"
                   className="font-semibold text-amber-900 underline decoration-amber-700/40 underline-offset-2 hover:text-amber-950"
                 >
-                  Singles Unplugged — 2 May 2026
+                  Singles Unplugged — 3 May 2026
                 </Link>
               </p>
             </div>

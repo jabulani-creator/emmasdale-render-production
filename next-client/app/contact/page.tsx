@@ -73,7 +73,14 @@ export default async function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Phone</h4>
-                  <p className="text-slate-600 mt-1">+260 972 975 737</p>
+                  <p className="text-slate-600 mt-1 space-y-1">
+                    <a href="tel:+260972975737" className="block hover:text-teal-700 transition-colors">
+                      +260 972 975 737
+                    </a>
+                    <a href="tel:+260977403741" className="block hover:text-teal-700 transition-colors">
+                      +260 977 403 741
+                    </a>
+                  </p>
                 </div>
               </div>
               

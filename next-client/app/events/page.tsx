@@ -99,7 +99,7 @@ export default async function EventsPage() {
                 href="/events/singles-unplugged"
                 className="font-semibold text-amber-900 underline decoration-amber-700/50 underline-offset-2 hover:text-amber-950"
               >
-                Singles Unplugged — 2 May 2026
+                Singles Unplugged — 3 May 2026
               </Link>
               <span className="text-stone-600"> · Invitation &amp; seat reservation</span>
             </p>

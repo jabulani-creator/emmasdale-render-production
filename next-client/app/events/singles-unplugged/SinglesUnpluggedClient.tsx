@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -11,7 +10,6 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaMapMarkerAlt,
-  FaMobileAlt,
   FaRegCalendarAlt,
   FaRegClock,
   FaTshirt,
@@ -21,10 +19,11 @@ import {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 const TOTAL_SEATS = 100;
 const SEAT_POLL_MS = 15000;
-const WHATSAPP_DIGITS = process.env.NEXT_PUBLIC_SINGLES_EVENT_WHATSAPP || "260972975737";
+const WHATSAPP_DIGITS = process.env.NEXT_PUBLIC_SINGLES_EVENT_WHATSAPP || "260977403741";
 const CHURCH_PHONE_DISPLAY = "+260 972 975 737";
+const EVENT_OFFICE_PHONE_DISPLAY = "+260 977 403 741";
 
-const EVENT_START_MS = new Date("2026-05-02T18:00:00+02:00").getTime();
+const EVENT_START_MS = new Date("2026-05-03T08:00:00+02:00").getTime();
 
 const MAP_EMBED =
   "https://www.google.com/maps?q=Honeycomb+Junction+14+Miles+Great+North+Road+Lusaka+Zambia&output=embed";
@@ -38,10 +37,10 @@ const sectionLabel = "font-sans text-[10px] font-semibold uppercase tracking-[0.
 const CAL_TITLE = "Singles Unplugged — Emmasdale SDA Church";
 const CAL_TAGLINE = "Prayerfully Pursuing Purpose and Partnership";
 const CAL_LOCATION = "Honeycomb Junction, 14 Miles Great North Road, Lusaka, Zambia";
-/** 18:00–21:00 CAT (UTC+2) on 2 May 2026 */
-const CAL_GOOGLE_DATES = "20260502T160000Z/20260502T190000Z";
-const CAL_OUTLOOK_START = "2026-05-02T16:00:00.000Z";
-const CAL_OUTLOOK_END = "2026-05-02T19:00:00.000Z";
+/** 08:00–18:00 CAT (UTC+2) on 3 May 2026 */
+const CAL_GOOGLE_DATES = "20260503T060000Z/20260503T160000Z";
+const CAL_OUTLOOK_START = "2026-05-03T06:00:00.000Z";
+const CAL_OUTLOOK_END = "2026-05-03T16:00:00.000Z";
 
 function escapeIcsText(text: string): string {
   return text.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
@@ -87,10 +86,10 @@ function buildIcsDocument(pageUrl: string): string {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
-    "UID:singles-unplugged-20260502@emmasdalesda-church",
+    "UID:singles-unplugged-20260503@emmasdalesda-church",
     `DTSTAMP:${formatIcsTimestamp(new Date())}`,
-    "DTSTART:20260502T160000Z",
-    "DTEND:20260502T190000Z",
+    "DTSTART:20260503T060000Z",
+    "DTEND:20260503T160000Z",
     `SUMMARY:${escapeIcsText(CAL_TITLE)}`,
     `DESCRIPTION:${desc}`,
     `LOCATION:${escapeIcsText(CAL_LOCATION)}`,
@@ -108,7 +107,7 @@ function downloadIcs(pageUrl: string): void {
   const href = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = href;
-  a.download = "singles-unplugged-2026-05-02.ics";
+  a.download = "singles-unplugged-2026-05-03.ics";
   a.rel = "noopener";
   document.body.appendChild(a);
   a.click();
@@ -184,7 +183,6 @@ type FormValues = {
   gender: "Male" | "Female";
   ageGroup: "18-24" | "25-32" | "33+";
   dietary: string;
-  heardFrom: "Church announcement" | "WhatsApp" | "Friend invitation" | "Poster" | "Other";
   joinWhatsappGroup: "yes" | "no";
   numberOfPeople: "1" | "2";
 };
@@ -212,15 +210,19 @@ const TOPICS: { title: string; blurb: string }[] = [
   },
 ];
 
+const COUNTDOWN_LABELS = ["Days", "Hrs", "Min", "Sec"] as const;
+
 function StatsBar({ remaining, total }: { remaining: number; total: number }) {
-  const [now, setNow] = useState(() => Date.now());
+  /** `null` until after mount so SSR and first client paint match (avoids hydration mismatch from Date.now()). */
+  const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
+    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-  const left = EVENT_START_MS - now;
+  const left = now === null ? null : EVENT_START_MS - now;
   const cells =
-    left > 0
+    left !== null && left > 0
       ? (() => {
           const d = Math.floor(left / 86400000);
           const h = Math.floor((left % 86400000) / 3600000);
@@ -240,7 +242,7 @@ function StatsBar({ remaining, total }: { remaining: number; total: number }) {
   return (
     <div id="live-stats" className="bg-slate-50 px-4 py-8 sm:px-6 sm:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm">
-        <div className="grid grid-cols-1 divide-y divide-slate-200 px-4 py-8 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-8 md:py-10">
+        <div className="grid grid-cols-1 divide-y divide-slate-200 px-4 py-8 sm:px-6 md:grid-cols-2 md:divide-x md:divide-y-0 md:px-8 md:py-10">
         <div className="pb-8 text-center md:pb-0 md:pr-8 md:text-left">
           <p className={colTitle}>Seats remaining</p>
           <p
@@ -253,18 +255,13 @@ function StatsBar({ remaining, total }: { remaining: number; total: number }) {
               of {total} left
             </span>
           </p>
-          <p className="mt-2 font-sans text-xs text-slate-500">Updates when others reserve</p>
-        </div>
-        <div className="py-8 text-center md:px-8 md:py-0">
-          <p className={colTitle}>Contribution</p>
-          <p className="font-su-serif mt-3 text-3xl font-medium text-slate-900 sm:text-4xl">K100</p>
-          <p className="mt-2 font-sans text-sm leading-relaxed text-slate-600">Per person · Airtel Money on WhatsApp</p>
+          <p className="mt-2 font-sans text-xs text-slate-500">Updates when others register</p>
         </div>
         <div className="pt-8 text-center md:pl-8 md:pt-0 md:text-left">
           <p className={colTitle}>Event begins in</p>
-          {left <= 0 ? (
+          {left !== null && left <= 0 ? (
             <p className="mt-4 font-sans text-sm font-medium text-slate-700">We&apos;re live — see you at the venue.</p>
-          ) : (
+          ) : left !== null && left > 0 ? (
             <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
               {cells.map(({ v, l }) => (
                 <div
@@ -272,6 +269,18 @@ function StatsBar({ remaining, total }: { remaining: number; total: number }) {
                   className="flex min-w-[3.5rem] flex-col rounded-xl border border-slate-200 bg-slate-50/80 px-2 py-2.5 text-center shadow-sm ring-1 ring-slate-900/[0.04]"
                 >
                   <span className="font-su-serif text-2xl font-medium tabular-nums text-slate-900">{v}</span>
+                  <span className="font-sans text-[10px] font-medium uppercase tracking-wider text-slate-500">{l}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start" aria-hidden="true">
+              {COUNTDOWN_LABELS.map((l) => (
+                <div
+                  key={l}
+                  className="flex min-w-[3.5rem] flex-col rounded-xl border border-slate-200 bg-slate-50/80 px-2 py-2.5 text-center shadow-sm ring-1 ring-slate-900/[0.04]"
+                >
+                  <span className="font-su-serif text-2xl font-medium tabular-nums text-slate-400">—</span>
                   <span className="font-sans text-[10px] font-medium uppercase tracking-wider text-slate-500">{l}</span>
                 </div>
               ))}
@@ -290,7 +299,6 @@ const inputClass =
 const labelClass = "mb-1.5 block font-sans text-sm font-medium text-slate-700";
 
 export function SinglesUnpluggedClient() {
-  const router = useRouter();
   const heroRef = useRef<HTMLElement>(null);
   const [showStickyCta, setShowStickyCta] = useState(false);
   const [moreDetailsOpen, setMoreDetailsOpen] = useState(false);
@@ -302,6 +310,7 @@ export function SinglesUnpluggedClient() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
     watch,
   } = useForm<FormValues>({
@@ -313,7 +322,6 @@ export function SinglesUnpluggedClient() {
       gender: "Male",
       ageGroup: "25-32",
       dietary: "",
-      heardFrom: "Church announcement",
       joinWhatsappGroup: "yes",
       numberOfPeople: "1",
     },
@@ -373,20 +381,23 @@ export function SinglesUnpluggedClient() {
         gender: values.gender,
         ageGroup: values.ageGroup,
         dietary: values.dietary.trim() || "",
-        heardFrom: values.heardFrom,
         joinWhatsappGroup: values.joinWhatsappGroup === "yes",
         numberOfPeople: Number(values.numberOfPeople) as 1 | 2,
       };
 
-      const { data } = await axios.post(`${API_BASE}/singles-unplugged/reservations`, payload);
-      const rid = (data.reservation as { id?: string })?.id;
+      await axios.post(`${API_BASE}/singles-unplugged/reservations`, payload);
       await refreshSeats();
-      toast.success("Seat held — follow the steps to pay with Airtel Money.");
-      if (rid) {
-        router.push(`/events/singles-unplugged/checkout/${rid}`);
-      } else {
-        toast.error("Reservation saved but checkout link failed. Contact the church office.");
-      }
+      toast.success("You are registered. Thank you — we will see you at the event.");
+      reset({
+        fullName: "",
+        phone: "",
+        email: "",
+        gender: values.gender,
+        ageGroup: values.ageGroup,
+        dietary: "",
+        joinWhatsappGroup: values.joinWhatsappGroup,
+        numberOfPeople: values.numberOfPeople,
+      });
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         const msg = (e.response?.data as { msg?: string })?.msg || "Something went wrong. Please try again.";
@@ -447,11 +458,11 @@ export function SinglesUnpluggedClient() {
           <ul className="mx-auto mt-10 max-w-md space-y-3 font-sans text-sm text-slate-300 sm:text-[15px] lg:mx-0">
             <li className="flex items-start justify-center gap-3 lg:justify-start">
               <FaRegCalendarAlt className="mt-0.5 shrink-0 text-teal-400" aria-hidden />
-              <span>Saturday 2 May 2026</span>
+              <span>Sunday 3 May 2026</span>
             </li>
             <li className="flex items-start justify-center gap-3 lg:justify-start">
               <FaRegClock className="mt-0.5 shrink-0 text-teal-400" aria-hidden />
-              <span>18:00 – 21:00 CAT</span>
+              <span>08:00 – 18:00 CAT</span>
             </li>
             <li className="flex items-start justify-center gap-3 lg:justify-start">
               <FaMapMarkerAlt className="mt-0.5 shrink-0 text-teal-400" aria-hidden />
@@ -464,7 +475,7 @@ export function SinglesUnpluggedClient() {
               href="#reserve"
               className="inline-flex h-12 min-h-[48px] w-full items-center justify-center rounded-full bg-amber-500 px-8 font-sans text-sm font-bold text-white shadow-md transition hover:bg-amber-400 sm:w-auto"
             >
-              Reserve a seat — K100
+              Reserve a seat
             </a>
             <a
               href="#logistics"
@@ -559,7 +570,7 @@ export function SinglesUnpluggedClient() {
           <p className={sectionLabel}>Venue</p>
           <h2 className="font-su-serif mt-3 text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl">Honeycomb Junction</h2>
           <p className="mt-3 max-w-2xl font-sans text-sm leading-relaxed text-slate-600 sm:text-[15px]">
-            14 Miles, Great North Road, Lusaka. Saturday 2 May 2026, 18:00–21:00 CAT.
+            14 Miles, Great North Road, Lusaka. Sunday 3 May 2026, 08:00–18:00 CAT.
           </p>
           <AddToCalendarBar pageUrl={calendarPageUrl} variant="venue" className="mt-5" />
 
@@ -593,13 +604,15 @@ export function SinglesUnpluggedClient() {
               <h3 className="font-su-serif text-lg font-medium text-slate-900">Dress code</h3>
               <p className="mt-2 font-sans text-sm leading-relaxed text-slate-600">Smart casual, modest.</p>
               <div className="mt-8 border-t border-slate-200 pt-8">
-                <p className="font-sans text-xs font-semibold uppercase tracking-wider text-slate-500">Contribution</p>
-                <p className="font-su-serif mt-2 text-3xl font-medium text-slate-900">K100</p>
-                <p className="mt-1 font-sans text-sm text-slate-600">Per person · Airtel Money via WhatsApp</p>
-              </div>
-              <div className="mt-8 border-t border-slate-200 pt-8">
                 <p className="font-sans text-xs font-semibold uppercase tracking-wider text-slate-500">Questions</p>
-                <p className="mt-2 font-sans text-sm text-slate-700">{CHURCH_PHONE_DISPLAY}</p>
+                <p className="mt-2 space-y-1 font-sans text-sm text-slate-700">
+                  <a href="tel:+260972975737" className="block hover:text-teal-700">
+                    {CHURCH_PHONE_DISPLAY}
+                  </a>
+                  <a href="tel:+260977403741" className="block hover:text-teal-700">
+                    {EVENT_OFFICE_PHONE_DISPLAY}
+                  </a>
+                </p>
                 <a
                   href={`https://wa.me/${WHATSAPP_DIGITS}`}
                   target="_blank"
@@ -618,34 +631,15 @@ export function SinglesUnpluggedClient() {
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-8 sm:px-10 sm:py-10">
               <p className={sectionLabel}>Registration</p>
-              <h2 className="font-su-serif mt-3 text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl md:text-4xl">Secure your place</h2>
+              <h2 className="font-su-serif mt-3 text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl md:text-4xl">Register your seat</h2>
               <p className="mt-4 max-w-xl font-sans text-sm leading-relaxed text-slate-600 sm:text-[15px]">
-                After you submit, you&apos;ll complete <span className="font-medium text-slate-800">K100</span> per person via{" "}
-                <span className="font-medium text-slate-800">Airtel Money</span> on WhatsApp.{" "}
+                Fill in your details below.{" "}
                 <a href="#live-stats" className="font-medium text-teal-800 underline decoration-teal-500/40 underline-offset-2 hover:decoration-teal-600">
                   Live seat count
                 </a>{" "}
-                is above.
+                is above. If anything changes before the event, we will reach you on the phone number you provide.
               </p>
-              <div className="mt-6 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <FaMobileAlt className="mt-0.5 shrink-0 text-slate-500" aria-hidden />
-                <p className="font-sans text-sm text-slate-600">Use the WhatsApp number linked to your Airtel Money.</p>
-              </div>
             </div>
-
-            <details className="group border-b border-slate-200 px-5 py-4 sm:px-10">
-              <summary className="cursor-pointer list-none font-sans text-sm font-medium text-slate-800 marker:content-none [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex items-center gap-2">
-                  After you pay
-                  <FaChevronDown className="h-3.5 w-3.5 text-slate-400 transition group-open:rotate-180" aria-hidden />
-                </span>
-              </summary>
-              <ol className="mt-3 list-decimal space-y-2 pl-4 font-sans text-sm leading-relaxed text-slate-600">
-                <li>Submit the form, then pay in WhatsApp.</li>
-                <li>Treasury confirms your seat.</li>
-                <li>We may send reminders before the event.</li>
-              </ol>
-            </details>
 
             <form onSubmit={handleSubmit(onSubmit)} className="mx-auto max-w-lg space-y-5 px-5 py-8 sm:px-10 sm:py-10">
               <div>
@@ -699,22 +693,10 @@ export function SinglesUnpluggedClient() {
                   Seats <span className="text-red-600">*</span>
                 </label>
                 <select {...register("numberOfPeople")} className={inputClass}>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
+                  <option value="1">1 person</option>
+                  <option value="2">2 people</option>
                 </select>
-                <p className="mt-1 text-xs text-slate-500">
-                  K100 × {numberOfPeople} = K{Number(numberOfPeople) * 100}
-                </p>
-              </div>
-              <div>
-                <label className={labelClass}>How did you hear about this?</label>
-                <select {...register("heardFrom")} className={inputClass}>
-                  <option value="Church announcement">Church announcement</option>
-                  <option value="WhatsApp">WhatsApp</option>
-                  <option value="Friend invitation">Friend</option>
-                  <option value="Poster">Poster</option>
-                  <option value="Other">Other</option>
-                </select>
+                <p className="mt-1 text-xs text-slate-500">Including yourself — one form for your group.</p>
               </div>
               <div>
                 <label className={labelClass}>Post-event WhatsApp group</label>
@@ -750,17 +732,13 @@ export function SinglesUnpluggedClient() {
                 disabled={submitting || remaining < Number(numberOfPeople)}
                 className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-teal-600 font-sans text-sm font-bold uppercase tracking-wide text-white shadow-md transition hover:bg-teal-500 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {submitting ? "Saving…" : (
-                  <>
-                    Continue to payment <span aria-hidden>→</span>
-                  </>
-                )}
+                {submitting ? "Saving…" : "Submit registration"}
               </button>
               {remaining < Number(numberOfPeople) && (
                 <p className="text-center font-sans text-xs text-red-600">Not enough seats for this group size.</p>
               )}
               <p className="text-center font-sans text-[11px] leading-relaxed text-slate-500">
-                Limited seats · payment order · cancel 48h ahead if you can
+                Limited seats · first come, first served · let us know if your plans change
               </p>
             </form>
           </div>
@@ -770,7 +748,7 @@ export function SinglesUnpluggedClient() {
       <footer className="mt-4 border-t border-slate-200 bg-slate-900 px-4 py-12 text-center sm:py-14">
         <p className="font-sans text-sm font-medium text-white">Emmasdale Seventh-day Adventist Church</p>
         <p className="mx-auto mt-3 max-w-md font-sans text-xs leading-relaxed text-slate-400">
-          We do not store mobile money PINs on this site.
+          Your details are used only to plan this event and to contact you if needed.
         </p>
       </footer>
 
@@ -786,7 +764,7 @@ export function SinglesUnpluggedClient() {
               href="#reserve"
               className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-amber-500 px-5 font-sans text-xs font-bold text-white shadow-md transition hover:bg-amber-400 sm:text-sm"
             >
-              Reserve · K100
+              Reserve a seat
             </a>
           </div>
         </div>

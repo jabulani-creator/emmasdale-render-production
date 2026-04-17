@@ -3,10 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import SinglesUnpluggedReservation from "../models/SinglesUnpluggedReservation.js";
 import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors/index.ts";
+import { appendSinglesUnpluggedReservationToSheet } from "../utils/singlesUnpluggedSheetsSync.js";
 
-const EVENT_KEY = "singles-unplugged-2026-05-02";
+const EVENT_KEY = "singles-unplugged-2026-05-03";
 const CAPACITY = 100;
-const HOLD_MINUTES = 15;
+/** Legacy payment holds; registrations use `registered` and ignore this date. */
+const PLACEHOLDER_EXPIRY = new Date("2099-12-31T22:00:00.000Z");
 
 function generateTicketCode(): string {
   return `SU-2026-${randomBytes(3).toString("hex").toUpperCase()}`;
@@ -28,6 +30,7 @@ async function countHeldSeats(): Promise<number> {
       $match: {
         eventKey: EVENT_KEY,
         $or: [
+          { paymentStatus: "registered" },
           { paymentStatus: "paid" },
           { paymentStatus: "paid_requested" },
           {
@@ -86,7 +89,6 @@ const createReservation = async (req: any, res: any) => {
     throw new BadRequestError("Sorry, there are not enough seats left for your group size.");
   }
 
-  const pendingExpiresAt = new Date(Date.now() + HOLD_MINUTES * 60 * 1000);
   const ticketCode = await generateUniqueTicketCode();
 
   const reservation = await SinglesUnpluggedReservation.create({
@@ -97,16 +99,33 @@ const createReservation = async (req: any, res: any) => {
     gender: req.body.gender,
     ageGroup: req.body.ageGroup,
     dietary: req.body.dietary || "",
-    heardFrom: req.body.heardFrom,
     joinWhatsappGroup: req.body.joinWhatsappGroup,
     numberOfPeople,
-    paymentStatus: "pending",
-    pendingExpiresAt,
+    paymentStatus: "registered",
+    pendingExpiresAt: PLACEHOLDER_EXPIRY,
     ticketCode,
   });
 
   const newUsed = await countHeldSeats();
   const remaining = Math.max(0, CAPACITY - newUsed);
+
+  void appendSinglesUnpluggedReservationToSheet({
+    _id: reservation._id,
+    createdAt: reservation.createdAt,
+    ticketCode: reservation.ticketCode,
+    fullName: reservation.fullName,
+    phone: reservation.phone,
+    email: reservation.email,
+    gender: reservation.gender,
+    ageGroup: reservation.ageGroup,
+    dietary: reservation.dietary,
+    joinWhatsappGroup: reservation.joinWhatsappGroup,
+    numberOfPeople: reservation.numberOfPeople,
+    paymentStatus: reservation.paymentStatus,
+    eventKey: reservation.eventKey,
+  }).catch((err: unknown) => {
+    console.warn("[SinglesUnplugged→Sheets] Append failed (reservation still saved in MongoDB):", err);
+  });
 
   res.status(StatusCodes.CREATED).json({
     reservation: {
@@ -119,8 +138,7 @@ const createReservation = async (req: any, res: any) => {
       ticketCode: reservation.ticketCode,
     },
     seatsRemaining: remaining,
-    holdMinutes: HOLD_MINUTES,
-    msg: "Reservation recorded. Complete K100 payment within the hold window to confirm your seat.",
+    msg: "You are registered. We will be in touch if we need anything else before the event.",
   });
 };
 
@@ -160,7 +178,7 @@ const confirmPayment = async (req: any, res: any) => {
     });
   }
 
-  if (doc.paymentStatus !== "pending") {
+  if (doc.paymentStatus !== "pending" && doc.paymentStatus !== "registered") {
     throw new BadRequestError("This reservation cannot be updated.");
   }
 
@@ -175,7 +193,7 @@ const confirmPayment = async (req: any, res: any) => {
   await doc.save();
 
   res.status(StatusCodes.OK).json({
-    msg: "Thank you — treasury will verify your Airtel Money payment and confirm your seat.",
+    msg: "Thank you — we will verify your payment and confirm your seat.",
     reservation: {
       id: doc._id,
       paymentStatus: doc.paymentStatus,

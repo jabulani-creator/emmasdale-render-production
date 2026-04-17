@@ -4,7 +4,7 @@ const SinglesUnpluggedReservationSchema = new mongoose.Schema(
   {
     eventKey: {
       type: String,
-      default: "singles-unplugged-2026-05-02",
+      default: "singles-unplugged-2026-05-03",
       index: true,
     },
     fullName: {
@@ -41,11 +41,6 @@ const SinglesUnpluggedReservationSchema = new mongoose.Schema(
       maxlength: 500,
       default: "",
     },
-    heardFrom: {
-      type: String,
-      enum: ["Church announcement", "WhatsApp", "Friend invitation", "Poster", "Other"],
-      required: true,
-    },
     joinWhatsappGroup: {
       type: Boolean,
       required: true,
@@ -57,8 +52,8 @@ const SinglesUnpluggedReservationSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid_requested", "paid", "failed"],
-      default: "pending",
+      enum: ["registered", "pending", "paid_requested", "paid", "failed"],
+      default: "registered",
     },
     paymentReference: {
       type: String,

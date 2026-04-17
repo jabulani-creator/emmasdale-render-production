@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "Singles Unplugged | Emmasdale SDA Church",
   description:
-    "Prayerfully Pursuing Purpose and Partnership — Saturday 2 May 2026, 6–9 PM at Honeycomb Junction, Lusaka. 100 seats. K100, Airtel Money.",
+    "Prayerfully Pursuing Purpose and Partnership — Sunday 3 May 2026, 8am–6pm at Honeycomb Junction, Lusaka. Register online for a limited number of seats.",
   openGraph: {
     title: "Singles Unplugged — Digital invitation",
     description:
-      "Honest conversation, prayer, dinner & purposeful connection for young singles. Tap to view details and reserve.",
+      "Honest conversation, prayer, dinner & purposeful connection for young singles. Tap to view details and register.",
     type: "website",
     locale: "en_ZM",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Singles Unplugged | Emmasdale SDA Church",
-    description: "Saturday 2 May 2026 · Honeycomb Junction, Lusaka · Reserve your seat.",
+    description: "Sunday 3 May 2026, 8am–6pm · Honeycomb Junction, Lusaka · Reserve your seat.",
     images: [OG_IMAGE],
   },
 };

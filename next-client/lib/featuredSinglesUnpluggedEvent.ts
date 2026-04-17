@@ -2,9 +2,9 @@
 export const SINGLES_UNPLUGGED_LISTING = {
   _id: "featured-singles-unplugged-may-2026",
   eventTitle: "Singles Unplugged: Prayerfully Pursuing Purpose and Partnership",
-  eventDate: "2026-05-02",
+  eventDate: "2026-05-03",
   venue: "Honeycomb Junction, 14 Miles, Lusaka",
-  time: "6:00 PM – 9:00 PM",
+  time: "8:00 AM – 6:00 PM",
   eventPhoto:
     "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
   listBadge: "Special programme",

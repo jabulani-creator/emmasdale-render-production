@@ -59,7 +59,6 @@ export const singlesUnpluggedReservationSchema = z.object({
   gender: z.enum(["Male", "Female"]),
   ageGroup: z.enum(["18-24", "25-32", "33+"]),
   dietary: z.string().max(500).optional().or(z.literal("")),
-  heardFrom: z.enum(["Church announcement", "WhatsApp", "Friend invitation", "Poster", "Other"]),
   joinWhatsappGroup: z.boolean(),
   numberOfPeople: z.union([z.literal(1), z.literal(2)]),
 });
