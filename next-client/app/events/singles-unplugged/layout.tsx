@@ -8,8 +8,8 @@ const singlesSerif = Cormorant_Garamond({
   display: "swap",
 });
 
-const OG_IMAGE =
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&h=630&q=80";
+/** Local asset: `next-client/public/single.jpg` (resolved with `metadataBase` for OG/Twitter) */
+const OG_IMAGE = "/single.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Singles Unplugged — Digital invitation",
     description:
-      "Honest conversation, prayer, dinner & purposeful connection for young singles. Tap to view details and register.",
+      "Honest conversation, prayer, fellowship & purposeful connection for young singles. Tap to view details and register.",
     type: "website",
     locale: "en_ZM",
     images: [

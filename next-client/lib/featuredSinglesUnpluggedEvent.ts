@@ -5,8 +5,7 @@ export const SINGLES_UNPLUGGED_LISTING = {
   eventDate: "2026-05-03",
   venue: "Honeycomb Junction, 14 Miles, Lusaka",
   time: "8:00 AM – 6:00 PM",
-  eventPhoto:
-    "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
+  eventPhoto: "/single.jpg",
   listBadge: "Special programme",
   primaryCtaHref: "/events/singles-unplugged",
   secondaryCtaHrefTeaser: "/events",

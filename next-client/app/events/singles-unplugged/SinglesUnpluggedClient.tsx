@@ -28,8 +28,8 @@ const EVENT_START_MS = new Date("2026-05-03T08:00:00+02:00").getTime();
 const MAP_EMBED =
   "https://www.google.com/maps?q=Honeycomb+Junction+14+Miles+Great+North+Road+Lusaka+Zambia&output=embed";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1920&q=80";
+/** Local asset: `next-client/public/single.jpg` */
+const HERO_IMAGE = "/single.jpg";
 
 /** Section labels — match site neutrals (events / slate UI) */
 const sectionLabel = "font-sans text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500";
@@ -433,7 +433,7 @@ export function SinglesUnpluggedClient() {
         <div className="pointer-events-none absolute inset-0">
           <Image
             src={HERO_IMAGE}
-            alt="Young adults in conversation"
+            alt="Singles Unplugged — Emmasdale SDA Church"
             fill
             priority
             className="object-cover opacity-[0.2] mix-blend-overlay sm:opacity-[0.22]"
@@ -530,8 +530,8 @@ export function SinglesUnpluggedClient() {
 
       <div className="relative z-20 mx-auto max-w-5xl space-y-16 px-4 py-16 sm:space-y-20 sm:px-8 sm:py-20">
         <section>
-          <p className={sectionLabel}>Running program</p>
-          <h2 className="font-su-serif mt-3 text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl">Evening sessions</h2>
+          <p className={sectionLabel}>Programme</p>
+          <h2 className="font-su-serif mt-3 text-2xl font-medium tracking-tight text-slate-900 sm:text-3xl">Topics we&apos;ll cover</h2>
           <p className="mt-2 font-sans text-sm text-slate-600">Tap a topic for more</p>
           <ul className="mt-8 grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
             {TOPICS.map((t, i) => {
